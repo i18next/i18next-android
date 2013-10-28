@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.regex.Pattern;
 
 import org.json.JSONException;
@@ -24,6 +23,9 @@ import android.util.Log;
 public class I18Next {
     /** Used locally to tag Logs */
     private static final String TAG = I18Next.class.getSimpleName();
+
+    private static final String SEPARATOR_LANGUAGE_COUNTRY = "_";
+    private static final String WRONG_SEPARATOR_LANGUAGE_COUNTRY = "_";
 
     private Options mOptions = new Options();
     private JSONObject mRootObject = new JSONObject();
@@ -51,16 +53,29 @@ public class I18Next {
         return mOptions;
     }
 
+    public void load(String namespace, String json) throws JSONException {
+        load(mOptions.getLanguage(), namespace, new JSONObject(json));
+    }
+
     public void load(String lang, String namespace, String json) throws JSONException {
         load(lang, namespace, new JSONObject(json));
     }
 
+    public void load(String namespace, JSONObject json) throws JSONException {
+        load(mOptions.getLanguage(), namespace, json);
+    }
+
     public void load(String lang, String namespace, JSONObject json) throws JSONException {
-        mRootObject.put(namespace, json);
+        JSONObject rootLanguage = mRootObject.optJSONObject(getConvertLang(lang));
+        if (rootLanguage == null) {
+            rootLanguage = new JSONObject();
+            mRootObject.put(lang, rootLanguage);
+        }
+        rootLanguage.put(namespace, json);
     }
 
     public void load(Context context, String namespace, int resource) throws JSONException, IOException {
-        load(context, Locale.getDefault().toString(), namespace, resource);
+        load(context, mOptions.getLanguage(), namespace, resource);
     }
 
     public void load(Context context, String lang, String namespace, int resource) throws JSONException, IOException {
@@ -193,35 +208,65 @@ public class I18Next {
     }
 
     private String getValueRaw(String key, Operation operation) {
-        String namespace = getNamespace(key);
-        if (namespace != null) {
-            if (key.startsWith(namespace)) {
-                key = key.substring(namespace.length() + 1); // +1 for the colon
-            }
-            if (operation instanceof Operation.PreOperation) {
-                // it's the last key part
-                key = ((Operation.PreOperation) operation).preProcess(key);
-            }
-            String[] splitKeys = splitKeyPath(key);
-            if (splitKeys != null) {
-                Object o = mRootObject.opt(namespace);
-                for (int i = 0; i < splitKeys.length; i++) {
-                    String splitKey = splitKeys[i];
-                    if (o instanceof JSONObject) {
-                        o = ((JSONObject) o).opt(splitKey);
-                    } else {
-                        o = null;
-                        break;
-                    }
+        JSONObject rootObject = getRootObjectByLang(mOptions.getLanguage(), false);
+        if (rootObject != null) {
+            String namespace = getNamespace(key);
+            if (namespace != null) {
+                if (key.startsWith(namespace)) {
+                    key = key.substring(namespace.length() + 1); // +1 for the colon
                 }
-                if (o instanceof String) {
-                    return (String) o;
-                } else {
-                    log(LogMode.WARNING, "impossible to found key '%s'", key);
+                if (operation instanceof Operation.PreOperation) {
+                    // it's the last key part
+                    key = ((Operation.PreOperation) operation).preProcess(key);
+                }
+                String[] splitKeys = splitKeyPath(key);
+                if (splitKeys != null) {
+                    Object o = rootObject.opt(namespace);
+                    for (int i = 0; i < splitKeys.length; i++) {
+                        String splitKey = splitKeys[i];
+                        if (o instanceof JSONObject) {
+                            o = ((JSONObject) o).opt(splitKey);
+                        } else {
+                            o = null;
+                            break;
+                        }
+                    }
+                    if (o instanceof String) {
+                        return (String) o;
+                    } else {
+                        log(LogMode.WARNING, "impossible to found key '%s'", key);
+                    }
                 }
             }
         }
         return null;
+    }
+
+    private JSONObject getRootObjectByLang(String lang, boolean isFallbackLng) {
+        JSONObject result = null;
+        if (lang != null) {
+            result = mRootObject.optJSONObject(lang);
+            if (result == null) {
+                int indexOfLangSeparator = lang.lastIndexOf(SEPARATOR_LANGUAGE_COUNTRY);
+                if (indexOfLangSeparator > 0) {
+                    // found a separator
+                    result = getRootObjectByLang(lang.substring(0, indexOfLangSeparator), isFallbackLng);
+                } else if (!isFallbackLng) {
+                    String fallbackLanguage = mOptions.getFallbackLanguage();
+                    if (fallbackLanguage != null) {
+                        result = getRootObjectByLang(fallbackLanguage, true);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    static String getConvertLang(String lang) {
+        if (lang.contains(WRONG_SEPARATOR_LANGUAGE_COUNTRY)) {
+            lang = lang.replaceAll(WRONG_SEPARATOR_LANGUAGE_COUNTRY, SEPARATOR_LANGUAGE_COUNTRY);
+        }
+        return lang;
     }
 
     private String innerProcessing(String raw) {

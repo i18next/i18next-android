@@ -26,6 +26,7 @@ public class Options {
     private String mNsSeparator = ":";
     private String mKeySeparator = ".";
     private String mForcedLanguage;
+    private String mFallbackLanguage;
 
     public Options setNamespaces(String... namespaces) {
         mNameSpaces = namespaces;
@@ -135,12 +136,21 @@ public class Options {
     }
 
     public Options setLanguage(String forcedLanguage) {
-        mForcedLanguage = forcedLanguage;
+        mForcedLanguage = I18Next.getConvertLang(forcedLanguage);
         return this;
     }
 
     public Options setLanguageAutoDetected() {
         return setLanguage(null);
+    }
+
+    public String getFallbackLanguage() {
+        return mFallbackLanguage;
+    }
+
+    public Options setFallbackLanguage(String fallbackLanguage) {
+        mFallbackLanguage = I18Next.getConvertLang(fallbackLanguage);
+        return this;
     }
 
 }
