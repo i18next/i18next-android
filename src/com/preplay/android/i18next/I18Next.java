@@ -49,6 +49,14 @@ public class I18Next {
         VERBOSE, WARNING, ERROR;
     }
 
+    public static boolean isI18NextKeyCandidate(CharSequence key) {
+        if (key != null && key.length() > 0) {
+            return key.toString().matches("([a-z]*(\\.)+[a-z]*)*");
+        } else {
+            return false;
+        }
+    }
+
     public Options getOptions() {
         return mOptions;
     }
@@ -80,28 +88,26 @@ public class I18Next {
 
     public void load(Context context, String lang, String namespace, int resource) throws JSONException, IOException {
         String json = null;
+        InputStream inputStream;
         try {
-            json = context.getResources().getString(resource);
+            inputStream = context.getResources().openRawResource(resource);
         } catch (Exception ex) {
-        }
-        if (json == null) {
-            InputStream inputStream;
             try {
-                inputStream = context.getResources().openRawResource(resource);
-            } catch (Exception ex) {
-                inputStream = null;
+                json = context.getResources().getString(resource);
+            } catch (Exception ex2) {
             }
-            if (inputStream != null) {
-                InputStreamReader is = new InputStreamReader(inputStream);
-                StringBuilder sb = new StringBuilder();
-                BufferedReader br = new BufferedReader(is);
-                String read = br.readLine();
-                while (read != null) {
-                    sb.append(read);
-                    read = br.readLine();
-                }
-                json = sb.toString();
+            inputStream = null;
+        }
+        if (json == null && inputStream != null) {
+            InputStreamReader is = new InputStreamReader(inputStream);
+            StringBuilder sb = new StringBuilder();
+            BufferedReader br = new BufferedReader(is);
+            String read = br.readLine();
+            while (read != null) {
+                sb.append(read);
+                read = br.readLine();
             }
+            json = sb.toString();
         }
         if (json == null) {
             throw new IOException("File not found");
