@@ -80,6 +80,9 @@ public class I18Next {
             mRootObject.put(lang, rootLanguage);
         }
         rootLanguage.put(namespace, json);
+        if (getOptions().getDefaultNamespace() == null) {
+            getOptions().setDefaultNamespace(namespace);
+        }
     }
 
     public void load(Context context, String namespace, int resource) throws JSONException, IOException {
