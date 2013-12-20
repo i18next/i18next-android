@@ -17,11 +17,11 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 
 public class I18NextResources extends Resources {
     /** Used locally to tag Logs */
-    @SuppressWarnings("unused")
     private static final String TAG = I18NextResources.class.getSimpleName();
 
     private Resources mBaseResources;
@@ -37,10 +37,14 @@ public class I18NextResources extends Resources {
 
     public CharSequence getTextTranslate(CharSequence txt, Operation operation) {
         if (I18Next.isI18NextKeyCandidate(txt)) {
-            return I18Next.getInstance().t(txt.toString(), operation);
-        } else {
-            return txt;
+            String res = I18Next.getInstance().t(txt.toString(), operation);
+            if (res == null) {
+                Log.w(TAG, "Key '" + txt + "' not found into I18Next");
+            } else {
+                return res;
+            }
         }
+        return txt;
     }
 
     public String getTextTranslate(String txt) {
@@ -53,7 +57,7 @@ public class I18NextResources extends Resources {
 
     @Override
     public CharSequence getText(int id) throws NotFoundException {
-        return getTextTranslate(mBaseResources.getText(id));
+        return getText(id, null);
     }
 
     @Override
@@ -201,7 +205,7 @@ public class I18NextResources extends Resources {
 
     @Override
     public void updateConfiguration(Configuration config, DisplayMetrics metrics) {
-        if(mBaseResources != null) {
+        if (mBaseResources != null) {
             mBaseResources.updateConfiguration(config, metrics);
         }
     }
@@ -250,6 +254,5 @@ public class I18NextResources extends Resources {
     public void parseBundleExtra(String tagName, AttributeSet attrs, Bundle outBundle) throws XmlPullParserException {
         mBaseResources.parseBundleExtra(tagName, attrs, outBundle);
     }
-    
-    
+
 }
