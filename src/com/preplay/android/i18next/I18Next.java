@@ -51,7 +51,7 @@ public class I18Next {
 
     public static boolean isI18NextKeyCandidate(CharSequence key) {
         if (key != null && key.length() > 0) {
-            return key.toString().matches("([a-z]*(\\.)+[a-z]*)*");
+            return key.toString().matches("([a-z]+((\\_)([a-z]+))*)+((\\.)[a-z]+((\\_)([a-z]+))*)+");
         } else {
             return false;
         }
