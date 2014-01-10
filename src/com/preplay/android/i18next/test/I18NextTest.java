@@ -22,6 +22,20 @@ public class I18NextTest extends TestCase {
     /** Used locally to tag Logs */
     private static final String TAG = I18NextTest.class.getSimpleName();
 
+    private String mPreviousDefaultNamespace;
+    private String mPreviousFallbackLanguage;
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+        if (mPreviousDefaultNamespace != null) {
+            I18Next.getInstance().getOptions().setDefaultNamespace(mPreviousDefaultNamespace);
+        }
+        if (mPreviousFallbackLanguage != null) {
+            I18Next.getInstance().getOptions().setFallbackLanguage(mPreviousFallbackLanguage);
+        }
+    }
+
     @Override
     public void setUp() {
         try {
@@ -29,6 +43,7 @@ public class I18NextTest extends TestCase {
         } catch (Exception e) {
             Log.w("TAG", e);
         }
+        mPreviousDefaultNamespace = I18Next.getInstance().getOptions().getDefaultNamespace();
         try {
             // {
             // "app" : {
@@ -54,18 +69,26 @@ public class I18NextTest extends TestCase {
             fail(e.getMessage());
         }
         try {
-            // {
-            // "app" : {
-            // "name" : "i18next"
-            // }
-            // }
             String content = "{\"app\":{\"name\":\"i18nextspecific\"}}";
             I18Next.getInstance().load("specific", content);
         } catch (JSONException e) {
             Log.w(TAG, e);
             fail(e.getMessage());
         }
+        try {
+            String content = "{\"app\":{\"name_on_this_language\":\"i18nextspecific in ZZ\"}}";
+            I18Next.getInstance().load("zz", "common_test", content);
+            I18Next.getInstance().getOptions().setFallbackLanguage("zz");
+        } catch (JSONException e) {
+            Log.w(TAG, e);
+            fail(e.getMessage());
+        }
         I18Next.getInstance().getOptions().setDefaultNamespace("common_test");
+    }
+    
+    @SmallTest
+    public void testShouldGetLanguageFallback() {
+        assertEquals("i18nextspecific in ZZ", I18Next.getInstance().t("app.name_on_this_language"));
     }
 
     @SmallTest

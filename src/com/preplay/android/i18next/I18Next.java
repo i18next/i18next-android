@@ -217,41 +217,50 @@ public class I18Next {
     }
 
     private String getValueRaw(String key, Operation operation) {
-        JSONObject rootObject = getRootObjectByLang(mOptions.getLanguage(), false);
+        String value = null;
+        String namespace = getNamespace(key);
+        if (namespace != null) {
+            if (key.startsWith(namespace)) {
+                key = key.substring(namespace.length() + 1); // +1 for the colon
+            }
+            if (operation instanceof Operation.PreOperation) {
+                // it's the last key part
+                key = ((Operation.PreOperation) operation).preProcess(key);
+            }
+            String[] splitKeys = splitKeyPath(key);
+            if (splitKeys != null) {
+                value = getValueRawByLanguageWithNamespace(mOptions.getLanguage(), namespace, splitKeys);
+                if(value == null) {
+                    value = getValueRawByLanguageWithNamespace(mOptions.getFallbackLanguage(), namespace, splitKeys);
+                }
+            }
+        }
+        return value;
+    }
+    
+    private String getValueRawByLanguageWithNamespace(String lang, String namespace, String[] splitKeys) {
+        JSONObject rootObject = getRootObjectByLang(lang);
         if (rootObject != null) {
-            String namespace = getNamespace(key);
-            if (namespace != null) {
-                if (key.startsWith(namespace)) {
-                    key = key.substring(namespace.length() + 1); // +1 for the colon
+            Object o = rootObject.opt(namespace);
+            for (int i = 0; i < splitKeys.length; i++) {
+                String splitKey = splitKeys[i];
+                if (o instanceof JSONObject) {
+                    o = ((JSONObject) o).opt(splitKey);
+                } else {
+                    o = null;
+                    break;
                 }
-                if (operation instanceof Operation.PreOperation) {
-                    // it's the last key part
-                    key = ((Operation.PreOperation) operation).preProcess(key);
-                }
-                String[] splitKeys = splitKeyPath(key);
-                if (splitKeys != null) {
-                    Object o = rootObject.opt(namespace);
-                    for (int i = 0; i < splitKeys.length; i++) {
-                        String splitKey = splitKeys[i];
-                        if (o instanceof JSONObject) {
-                            o = ((JSONObject) o).opt(splitKey);
-                        } else {
-                            o = null;
-                            break;
-                        }
-                    }
-                    if (o instanceof String) {
-                        return (String) o;
-                    } else {
-                        log(LogMode.WARNING, "impossible to found key '%s'", key);
-                    }
-                }
+            }
+            if (o instanceof String) {
+                return (String) o;
+            } else {
+                log(LogMode.WARNING, "impossible to found key '%s'", splitKeys[splitKeys.length - 1]);
             }
         }
         return null;
     }
 
-    private JSONObject getRootObjectByLang(String lang, boolean isFallbackLng) {
+    private JSONObject getRootObjectByLang(String lang) {
         JSONObject result = null;
         if (lang != null) {
             result = mRootObject.optJSONObject(lang);
@@ -259,12 +268,7 @@ public class I18Next {
                 int indexOfLangSeparator = lang.lastIndexOf(SEPARATOR_LANGUAGE_COUNTRY);
                 if (indexOfLangSeparator > 0) {
                     // found a separator
-                    result = getRootObjectByLang(lang.substring(0, indexOfLangSeparator), isFallbackLng);
-                } else if (!isFallbackLng) {
-                    String fallbackLanguage = mOptions.getFallbackLanguage();
-                    if (fallbackLanguage != null) {
-                        result = getRootObjectByLang(fallbackLanguage, true);
-                    }
+                    result = getRootObjectByLang(lang.substring(0, indexOfLangSeparator));
                 }
             }
         }
