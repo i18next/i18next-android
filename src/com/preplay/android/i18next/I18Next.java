@@ -230,14 +230,14 @@ public class I18Next {
             String[] splitKeys = splitKeyPath(key);
             if (splitKeys != null) {
                 value = getValueRawByLanguageWithNamespace(mOptions.getLanguage(), namespace, splitKeys);
-                if(value == null) {
+                if (value == null) {
                     value = getValueRawByLanguageWithNamespace(mOptions.getFallbackLanguage(), namespace, splitKeys);
                 }
             }
         }
         return value;
     }
-    
+
     private String getValueRawByLanguageWithNamespace(String lang, String namespace, String[] splitKeys) {
         JSONObject rootObject = getRootObjectByLang(lang);
         if (rootObject != null) {
@@ -299,7 +299,12 @@ public class I18Next {
                     if (replacement == null) {
                         replacement = "";
                     }
+                    int hashBefore = raw.hashCode();
                     raw = raw.replace(param, replacement);
+                    if (hashBefore != raw.hashCode()) {
+                        // the string has been changed, try to change it again
+                        raw = innerProcessing(raw);
+                    }
                 }
             }
         }

@@ -56,13 +56,15 @@ public class I18NextTest extends TestCase {
             // "child2" : "a child",
             // "child2_plural" : "some children",
             // "area" : "Area 51",
+            // "area2" : "Area 52",
             // "district" : "District 9 is more fun than $t(app.area)",
+            // "district_double" : "District 9 is more fun than $t(app.area) and $t(app.area2)",
             // "friend_context" : "A friend",
             // "friend_context_male" : "A boyfriend",
             // "friend_context_female" : "A girlfriend"
             // }
             // }
-            String content = "{\"app\":{\"name\":\"i18next\",\"insert\":\"you are __youAre__\",\"sprintf\":\"%s, %s, %s and %s\",\"sprintf2\":\"%d %f\",\"child\":\"__count__ child\",\"child_plural\":\"__count__ children\",\"child2\":\"a child\",\"child2_plural\":\"some children\",\"area\":\"Area 51\",\"district\":\"District 9 is more fun than $t(app.area)\",\"friend_context\":\"A friend\",\"friend_context_male\":\"A boyfriend\",\"friend_context_female\":\"A girlfriend\"}}";
+            String content = "{\"app\":{\"name\":\"i18next\",\"insert\":\"you are __youAre__\",\"sprintf\":\"%s, %s, %s and %s\",\"sprintf2\":\"%d %f\",\"child\":\"__count__ child\",\"child_plural\":\"__count__ children\",\"child2\":\"a child\",\"child2_plural\":\"some children\",\"area\":\"Area 51\",\"area2\":\"Area 52\",\"district\":\"District 9 is more fun than $t(app.area)\",\"district_double\" : \"District 9 is more fun than $t(app.area) and $t(app.area2)\",\"friend_context\":\"A friend\",\"friend_context_male\":\"A boyfriend\",\"friend_context_female\":\"A girlfriend\"}}";
             I18Next.getInstance().load("common_test", content);
         } catch (JSONException e) {
             Log.w(TAG, e);
@@ -152,6 +154,7 @@ public class I18NextTest extends TestCase {
     @SmallTest
     public void testShouldReturnValueNesting() {
         assertEquals("District 9 is more fun than Area 51", I18Next.getInstance().t("app.district"));
+        assertEquals("District 9 is more fun than Area 51 and Area 52", I18Next.getInstance().t("app.district_double"));
     }
 
     @SmallTest
