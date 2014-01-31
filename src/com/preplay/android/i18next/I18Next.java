@@ -14,6 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 /**
@@ -23,6 +24,8 @@ import android.util.Log;
 public class I18Next {
     /** Used locally to tag Logs */
     private static final String TAG = I18Next.class.getSimpleName();
+
+    private static final String PREF_KEY_I18N = "i18n_json";
 
     private static final String SEPARATOR_LANGUAGE_COUNTRY = "_";
     private static final String WRONG_SEPARATOR_LANGUAGE_COUNTRY = "_";
@@ -49,12 +52,31 @@ public class I18Next {
         VERBOSE, WARNING, ERROR;
     }
 
+    public void saveInPreference(SharedPreferences sharedPreference) {
+        sharedPreference.edit().putString(PREF_KEY_I18N, mRootObject.toString()).commit();
+    }
+
+    public void loadFromPreference(SharedPreferences sharedPreference) {
+        String content = sharedPreference.getString(PREF_KEY_I18N, null);
+        if (content != null && content.length() > 0) {
+            try {
+                mRootObject = new JSONObject(content);
+            } catch (JSONException e) {
+                Log.w(TAG, e);
+            }
+        }
+    }
+
     public static boolean isI18NextKeyCandidate(CharSequence key) {
         if (key != null && key.length() > 0) {
             return key.toString().matches("([a-z]+((\\_)([a-z]+))*)+((\\.)[a-z]+((\\_)([a-z]+))*)+");
         } else {
             return false;
         }
+    }
+
+    public boolean isEmpty() {
+        return mRootObject.length() == 0;
     }
 
     public Options getOptions() {
@@ -80,9 +102,6 @@ public class I18Next {
             mRootObject.put(lang, rootLanguage);
         }
         rootLanguage.put(namespace, json);
-        if (getOptions().getDefaultNamespace() == null) {
-            getOptions().setDefaultNamespace(namespace);
-        }
     }
 
     public void load(Context context, String namespace, int resource) throws JSONException, IOException {
