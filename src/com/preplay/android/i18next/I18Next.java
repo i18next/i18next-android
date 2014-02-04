@@ -236,6 +236,9 @@ public class I18Next {
     }
 
     private String getValueRaw(String key, Operation operation) {
+        if (key == null) {
+            return null;
+        }
         String value = null;
         String namespace = getNamespace(key);
         if (namespace != null) {
@@ -246,12 +249,29 @@ public class I18Next {
                 // it's the last key part
                 key = ((Operation.PreOperation) operation).preProcess(key);
             }
-            String[] splitKeys = splitKeyPath(key);
-            if (splitKeys != null) {
-                value = getValueRawByLanguageWithNamespace(mOptions.getLanguage(), namespace, splitKeys);
-                if (value == null) {
-                    value = getValueRawByLanguageWithNamespace(mOptions.getFallbackLanguage(), namespace, splitKeys);
+
+            value = getValueRawWithoutPreprocessing(namespace, key);
+
+            if (value == null && operation instanceof Operation.PreOperation) {
+                String repreProcessedKey = ((Operation.PreOperation) operation).preProcessAfterNoValueFound(key);
+                if (repreProcessedKey != null && !repreProcessedKey.equals(key)) {
+                    value = getValueRawWithoutPreprocessing(namespace, repreProcessedKey);
                 }
+            }
+        }
+        return value;
+    }
+
+    private String getValueRawWithoutPreprocessing(String namespace, String key) {
+        String value;
+
+        String[] splitKeys = splitKeyPath(key);
+        if (splitKeys == null) {
+            value = null;
+        } else {
+            value = getValueRawByLanguageWithNamespace(mOptions.getLanguage(), namespace, splitKeys);
+            if (value == null) {
+                value = getValueRawByLanguageWithNamespace(mOptions.getFallbackLanguage(), namespace, splitKeys);
             }
         }
         return value;

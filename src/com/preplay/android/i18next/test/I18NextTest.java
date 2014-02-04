@@ -61,10 +61,11 @@ public class I18NextTest extends TestCase {
             // "district_double" : "District 9 is more fun than $t(app.area) and $t(app.area2)",
             // "friend_context" : "A friend",
             // "friend_context_male" : "A boyfriend",
-            // "friend_context_female" : "A girlfriend"
+            // "friend_context_female" : "A girlfriend",
+            // "pack_of" : "Pack of __count__"
             // }
             // }
-            String content = "{\"app\":{\"name\":\"i18next\",\"insert\":\"you are __youAre__\",\"sprintf\":\"%s, %s, %s and %s\",\"sprintf2\":\"%d %f\",\"child\":\"__count__ child\",\"child_plural\":\"__count__ children\",\"child2\":\"a child\",\"child2_plural\":\"some children\",\"area\":\"Area 51\",\"area2\":\"Area 52\",\"district\":\"District 9 is more fun than $t(app.area)\",\"district_double\" : \"District 9 is more fun than $t(app.area) and $t(app.area2)\",\"friend_context\":\"A friend\",\"friend_context_male\":\"A boyfriend\",\"friend_context_female\":\"A girlfriend\"}}";
+            String content = "{\"app\":{\"name\":\"i18next\",\"insert\":\"you are __youAre__\",\"sprintf\":\"%s, %s, %s and %s\",\"sprintf2\":\"%d %f\",\"child\":\"__count__ child\",\"child_plural\":\"__count__ children\",\"child2\":\"a child\",\"child2_plural\":\"some children\",\"area\":\"Area 51\",\"area2\":\"Area 52\",\"district\":\"District 9 is more fun than $t(app.area)\",\"district_double\" : \"District 9 is more fun than $t(app.area) and $t(app.area2)\",\"friend_context\":\"A friend\",\"friend_context_male\":\"A boyfriend\",\"friend_context_female\":\"A girlfriend\",\"pack_of\":\"Pack of __count__\"}}";
             I18Next.getInstance().load("common_test", content);
         } catch (JSONException e) {
             Log.w(TAG, e);
@@ -149,6 +150,13 @@ public class I18NextTest extends TestCase {
         assertEquals("3 children", I18Next.getInstance().t("app.child", new Operation.Plural(3)));
         assertEquals("a child", I18Next.getInstance().t("app.child2", new Operation.Plural(1)));
         assertEquals("some children", I18Next.getInstance().t("app.child2", new Operation.Plural(3)));
+    }
+
+    @SmallTest
+    public void testShouldReturnValuePluralNotSpecified() {
+        assertEquals("Pack of 1", I18Next.getInstance().t("app.pack_of", new Operation.Plural(1)));
+        assertEquals("Pack of 3", I18Next.getInstance().t("app.pack_of", new Operation.Plural(3)));
+        assertEquals("Pack of 0", I18Next.getInstance().t("app.pack_of", new Operation.Plural(0)));
     }
 
     @SmallTest
