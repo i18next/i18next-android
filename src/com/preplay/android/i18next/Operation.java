@@ -15,6 +15,7 @@ public interface Operation {
 
     public interface PreOperation extends Operation {
         public abstract String preProcess(String key);
+        public abstract String preProcessAfterNoValueFound(String key);
     }
 
     public static class MultiPostProcessing implements PostOperation, PreOperation {
@@ -46,6 +47,11 @@ public interface Operation {
                 }
             }
             return key;
+        }
+
+        @Override
+        public String preProcessAfterNoValueFound(String key) {
+            return null;
         }
     }
 
@@ -80,6 +86,12 @@ public interface Operation {
         }
 
         @Override
+        public String preProcessAfterNoValueFound(String key) {
+            int index = key.lastIndexOf(I18Next.getInstance().getOptions().getPluralSuffix());
+            return key.substring(0, index);
+        }
+
+        @Override
         public String postProcess(String source) {
             return mInterpolation.postProcess(source);
         }
@@ -101,6 +113,11 @@ public interface Operation {
                 }
             }
             return key;
+        }
+
+        @Override
+        public String preProcessAfterNoValueFound(String key) {
+            return null;
         }
     }
 
