@@ -250,17 +250,19 @@ public class I18Next {
                 key = ((Operation.PreOperation) operation).preProcess(key);
             }
 
-            value = getValueRawFromNamespace(namespace, key);
+            value = getValueRawWithoutPreprocessing(namespace, key);
 
             if (value == null && operation instanceof Operation.PreOperation) {
-                key = ((Operation.PreOperation) operation).preProcessAfterNoValueFound(key);
-                value = getValueRawFromNamespace(namespace, key);
+                String repreProcessedKey = ((Operation.PreOperation) operation).preProcessAfterNoValueFound(key);
+                if (repreProcessedKey != null && !repreProcessedKey.equals(key)) {
+                    value = getValueRawWithoutPreprocessing(namespace, repreProcessedKey);
+                }
             }
         }
         return value;
     }
 
-    private String getValueRawFromNamespace(String namespace, String key) {
+    private String getValueRawWithoutPreprocessing(String namespace, String key) {
         String value;
 
         String[] splitKeys = splitKeyPath(key);
