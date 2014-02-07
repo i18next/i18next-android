@@ -334,7 +334,7 @@ public class I18Next {
         String reuseSuffix = mOptions.getReuseSuffix();
         if (raw != null && raw.length() > 0 && reusePrefix != null && reuseSuffix != null && reusePrefix.length() > 0 && reuseSuffix.length() > 0) {
             int indexOfPrefix = raw.indexOf(reusePrefix);
-            if (indexOfPrefix > 0) {
+            if (indexOfPrefix >= 0) {
                 int indexOfSuffix = raw.indexOf(reuseSuffix, indexOfPrefix);
                 if (indexOfSuffix > 0) {
                     // we've found a prefix and a suffix
