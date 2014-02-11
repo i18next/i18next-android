@@ -15,6 +15,7 @@ public interface Operation {
 
     public interface PreOperation extends Operation {
         public abstract String preProcess(String key);
+
         public abstract String preProcessAfterNoValueFound(String key);
     }
 
@@ -88,7 +89,11 @@ public interface Operation {
         @Override
         public String preProcessAfterNoValueFound(String key) {
             int index = key.lastIndexOf(I18Next.getInstance().getOptions().getPluralSuffix());
-            return key.substring(0, index);
+            if (index > 0) {
+                return key.substring(0, index);
+            } else {
+                return null;
+            }
         }
 
         @Override
