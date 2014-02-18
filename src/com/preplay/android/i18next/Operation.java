@@ -52,6 +52,16 @@ public interface Operation {
 
         @Override
         public String preProcessAfterNoValueFound(String key) {
+            if (mOperations != null) {
+                for (Operation operation : mOperations) {
+                    if (operation instanceof PreOperation) {
+                        String keyTemp = ((PreOperation) operation).preProcessAfterNoValueFound(key);
+                        if (keyTemp != null && !keyTemp.equals(key)) {
+                            return keyTemp;
+                        }
+                    }
+                }
+            }
             return null;
         }
     }
