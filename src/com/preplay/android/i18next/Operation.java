@@ -172,7 +172,7 @@ public interface Operation {
                 mStringBuffer.append(interpolationPrefix);
                 mStringBuffer.append(mTarget);
                 mStringBuffer.append(interpolationSuffix);
-                source = source.replace(mStringBuffer.toString(), mReplacement);
+                source = source.replace(mStringBuffer.toString(), mReplacement == null ? "" : mReplacement);
             }
             return source;
         }
