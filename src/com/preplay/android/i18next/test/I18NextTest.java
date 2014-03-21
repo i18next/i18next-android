@@ -88,7 +88,7 @@ public class I18NextTest extends TestCase {
         }
         I18Next.getInstance().getOptions().setDefaultNamespace("common_test");
     }
-    
+
     @SmallTest
     public void testShouldGetLanguageFallback() {
         assertEquals("i18nextspecific in ZZ", I18Next.getInstance().t("app.name_on_this_language"));
@@ -96,7 +96,7 @@ public class I18NextTest extends TestCase {
 
     @SmallTest
     public void testShouldAcceptCandidateKey() {
-        String[] listKeyValid = { "test.dot", "test.double.dot", "test.test_underscore", "test.test_double_underscore", "test.test_double_underscore.dot", "test.dot_double_underscore" };
+        String[] listKeyValid = { "test.dot", "test.double.dot", "test.test_underscore", "test.test_double_underscore", "test.test_double_underscore.dot", "test.dot_double_underscore", "test.test2" };
         String[] listKeyInvalid = { "test", "space not accepted", "double..dot" };
         for (String key : listKeyValid) {
             assertTrue("The key '" + key + "' should be accepted as a valid key", I18Next.isI18NextKeyCandidate(key));

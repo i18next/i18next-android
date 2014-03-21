@@ -69,7 +69,7 @@ public class I18Next {
 
     public static boolean isI18NextKeyCandidate(CharSequence key) {
         if (key != null && key.length() > 0) {
-            return key.toString().matches("([a-z]+((\\_)([a-z]+))*)+((\\.)[a-z]+((\\_)([a-z]+))*)+");
+            return key.toString().matches("([a-z0-9]+((\\_)([a-z0-9]+))*)+((\\.)[a-z0-9]+((\\_)([a-z0-9]+))*)+");
         } else {
             return false;
         }
@@ -295,7 +295,7 @@ public class I18Next {
             } else if (mOptions.isDebugMode()) {
                 StringBuffer sb = new StringBuffer();
                 for (int i = 0; i < splitKeys.length; i++) {
-                    if(sb.length() > 0) {
+                    if (sb.length() > 0) {
                         sb.append(".");
                     }
                     sb.append(splitKeys[i]);
