@@ -64,6 +64,30 @@ public interface Operation {
             }
             return null;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof MultiPostProcessing) {
+                Operation[] otherOperations = ((MultiPostProcessing) o).mOperations;
+                int nbElement = (mOperations == null) ? 0 : mOperations.length;
+                int nbElementOther = (otherOperations == null) ? 0 : otherOperations.length;
+                if (nbElement == nbElementOther) {
+                    if (nbElement == 0) {
+                        return true;
+                    } else {
+                        for (int i = 0; i < nbElement; i++) {
+                            Operation operation1 = mOperations[i];
+                            Operation operation2 = otherOperations[i];
+                            if ((operation1 != null && !operation1.equals(operation2)) || (operation1 == null && operation2 == null)) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 
     public static class Plural implements PreOperation, PostOperation {
@@ -110,6 +134,15 @@ public interface Operation {
         public String postProcess(String source) {
             return mInterpolation.postProcess(source);
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof Plural) {
+                Plural oPlural = (Plural) o;
+                return oPlural.mCount == mCount && mInterpolation.equals(oPlural.mInterpolation);
+            }
+            return false;
+        }
     }
 
     public static class Context implements PreOperation {
@@ -134,6 +167,14 @@ public interface Operation {
         public String preProcessAfterNoValueFound(String key) {
             return null;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof Context) {
+                return I18Next.equalsCharSequence(mContextPrefix, ((Context) o).mContextPrefix);
+            }
+            return false;
+        }
     }
 
     public static class SPrintF implements PostOperation {
@@ -149,6 +190,30 @@ public interface Operation {
                 source = String.format(source, mArgs);
             }
             return source;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof SPrintF) {
+                Object[] otherArgs = ((SPrintF) o).mArgs;
+                int nbElement = (mArgs == null) ? 0 : mArgs.length;
+                int nbElementOther = (otherArgs == null) ? 0 : otherArgs.length;
+                if (nbElement == nbElementOther) {
+                    if (nbElement == 0) {
+                        return true;
+                    } else {
+                        for (int i = 0; i < nbElement; i++) {
+                            Object arg1 = mArgs[i];
+                            Object arg2 = otherArgs[i];
+                            if ((arg1 != null && !arg1.equals(arg2)) || (arg1 == null && arg2 == null)) {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 
@@ -177,6 +242,13 @@ public interface Operation {
             return source;
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof Interpolation) {
+                return I18Next.equalsCharSequence(mTarget, ((Interpolation) o).mTarget) && I18Next.equalsCharSequence(mReplacement, ((Interpolation) o).mReplacement);
+            }
+            return false;
+        }
     }
 
     public static class DefaultValue implements PostOperation {
@@ -192,6 +264,14 @@ public interface Operation {
                 source = mValue;
             }
             return source;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof DefaultValue) {
+                return I18Next.equalsCharSequence(mValue, ((DefaultValue) o).mValue);
+            }
+            return false;
         }
     }
 }

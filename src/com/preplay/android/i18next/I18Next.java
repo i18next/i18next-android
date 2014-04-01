@@ -222,6 +222,8 @@ public class I18Next {
                 innerProcessValue = innerProcessing(getValueRaw(key, operation));
                 if (innerProcessValue != null) {
                     break;
+                } else if (mOptions.isDebugMode()) {
+                    log(LogMode.WARNING, "impossible to found key '%s'", key);
                 }
             }
         }
@@ -292,15 +294,6 @@ public class I18Next {
             }
             if (o instanceof String) {
                 return (String) o;
-            } else if (mOptions.isDebugMode()) {
-                StringBuffer sb = new StringBuffer();
-                for (int i = 0; i < splitKeys.length; i++) {
-                    if (sb.length() > 0) {
-                        sb.append(".");
-                    }
-                    sb.append(splitKeys[i]);
-                }
-                log(LogMode.WARNING, "impossible to found key '%s'", sb.toString());
             }
         }
         return null;
@@ -355,5 +348,9 @@ public class I18Next {
             }
         }
         return raw;
+    }
+
+    static boolean equalsCharSequence(CharSequence cs, CharSequence cs2) {
+        return (cs2 == null && cs == null) || (cs != null && cs.equals(cs2));
     }
 }
