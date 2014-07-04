@@ -66,21 +66,21 @@ public class I18NextTest extends TestCase {
             // }
             // }
             String content = "{\"app\":{\"name\":\"i18next\",\"insert\":\"you are __youAre__\",\"sprintf\":\"%s, %s, %s and %s\",\"sprintf2\":\"%d %f\",\"child\":\"__count__ child\",\"child_plural\":\"__count__ children\",\"child2\":\"a child\",\"child2_plural\":\"some children\",\"area\":\"Area 51\",\"area2\":\"Area 52\",\"district\":\"District 9 is more fun than $t(app.area)\",\"district_double\" : \"District 9 is more fun than $t(app.area) and $t(app.area2)\",\"friend_context\":\"A friend\",\"friend_context_male\":\"A boyfriend\",\"friend_context_female\":\"A girlfriend\",\"pack_of\":\"Pack of __count__\"}}";
-            I18Next.getInstance().load("common_test", content);
+            I18Next.getInstance().loader().from(content).namespace("common_test").load();
         } catch (JSONException e) {
             Log.w(TAG, e);
             fail(e.getMessage());
         }
         try {
             String content = "{\"app\":{\"name\":\"i18nextspecific\"}}";
-            I18Next.getInstance().load("specific", content);
+            I18Next.getInstance().loader().from(content).namespace("specific").load();
         } catch (JSONException e) {
             Log.w(TAG, e);
             fail(e.getMessage());
         }
         try {
             String content = "{\"app\":{\"name_on_this_language\":\"i18nextspecific in ZZ\"}}";
-            I18Next.getInstance().load("zz", "common_test", content);
+            I18Next.getInstance().loader().from(content).lang("zz").namespace("common_test").load();
             I18Next.getInstance().getOptions().setFallbackLanguage("zz");
         } catch (JSONException e) {
             Log.w(TAG, e);

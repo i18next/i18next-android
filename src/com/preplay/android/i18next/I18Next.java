@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.preplay.android.i18next;
 
@@ -19,10 +19,11 @@ import android.util.Log;
 
 /**
  * @author stan
- * 
  */
 public class I18Next {
-    /** Used locally to tag Logs */
+    /**
+     * Used locally to tag Logs
+     */
     private static final String TAG = I18Next.class.getSimpleName();
 
     private static final String PREF_KEY_I18N = "i18n_json";
@@ -41,11 +42,15 @@ public class I18Next {
         public static final I18Next INSTANCE = new I18Next();
     }
 
-    private I18Next() {
+    public I18Next() {
     }
 
     public static I18Next getInstance() {
         return SingletonHolder.INSTANCE;
+    }
+
+    public Loader loader() {
+        return new Loader(this);
     }
 
     private enum LogMode {
@@ -81,61 +86,6 @@ public class I18Next {
 
     public Options getOptions() {
         return mOptions;
-    }
-
-    public void load(String namespace, String json) throws JSONException {
-        load(mOptions.getLanguage(), namespace, new JSONObject(json));
-    }
-
-    public void load(String lang, String namespace, String json) throws JSONException {
-        load(lang, namespace, new JSONObject(json));
-    }
-
-    public void load(String namespace, JSONObject json) throws JSONException {
-        load(mOptions.getLanguage(), namespace, json);
-    }
-
-    public void load(String lang, String namespace, JSONObject json) throws JSONException {
-        JSONObject rootLanguage = mRootObject.optJSONObject(getConvertLang(lang));
-        if (rootLanguage == null) {
-            rootLanguage = new JSONObject();
-            mRootObject.put(lang, rootLanguage);
-        }
-        rootLanguage.put(namespace, json);
-    }
-
-    public void load(Context context, String namespace, int resource) throws JSONException, IOException {
-        load(context, mOptions.getLanguage(), namespace, resource);
-    }
-
-    public void load(Context context, String lang, String namespace, int resource) throws JSONException, IOException {
-        String json = null;
-        InputStream inputStream;
-        try {
-            inputStream = context.getResources().openRawResource(resource);
-        } catch (Exception ex) {
-            try {
-                json = context.getResources().getString(resource);
-            } catch (Exception ex2) {
-            }
-            inputStream = null;
-        }
-        if (json == null && inputStream != null) {
-            InputStreamReader is = new InputStreamReader(inputStream);
-            StringBuilder sb = new StringBuilder();
-            BufferedReader br = new BufferedReader(is);
-            String read = br.readLine();
-            while (read != null) {
-                sb.append(read);
-                read = br.readLine();
-            }
-            json = sb.toString();
-        }
-        if (json == null) {
-            throw new IOException("File not found");
-        } else {
-            load(lang, namespace, json);
-        }
     }
 
     private void log(String raw, Object... args) {
@@ -182,18 +132,14 @@ public class I18Next {
                 return namespace;
             }
         }
-        String defaultNameSpace = mOptions.getDefaultNamespace();
-        if (defaultNameSpace == null) {
-            Iterator<?> iterator = mRootObject.keys();
-            if (iterator.hasNext()) {
-                defaultNameSpace = String.valueOf(iterator.next());
-                log("namespace taken from the first key available (it's now our default namespace): %s", defaultNameSpace);
-                mOptions.setDefaultNamespace(defaultNameSpace);
-            }
-        } else {
-            log("namespace found in default: %s", defaultNameSpace);
+        return mOptions.getDefaultNamespace();
+    }
+
+    private void initDefaultNamespaceIfNeeded(String nameSpace) {
+        if (mOptions.getDefaultNamespace() == null) {
+            log("namespace taken from the first key available (it's now our default namespace): %s", nameSpace);
+            mOptions.setDefaultNamespace(nameSpace);
         }
-        return defaultNameSpace;
     }
 
     public String t(String key) {
@@ -202,7 +148,7 @@ public class I18Next {
 
     /**
      * Using multiple keys (first found will be translated)
-     * 
+     *
      * @param keys
      * @return
      */
@@ -211,7 +157,7 @@ public class I18Next {
     }
 
     public String t(String key, Operation operation) {
-        String[] keys = { key };
+        String[] keys = {key};
         return t(keys, operation);
     }
 
@@ -350,7 +296,88 @@ public class I18Next {
         return raw;
     }
 
+
+    private void load(String lang, String namespace, JSONObject json) throws JSONException {
+        JSONObject rootLanguage = mRootObject.optJSONObject(getConvertLang(lang));
+        if (rootLanguage == null) {
+            rootLanguage = new JSONObject();
+            mRootObject.put(lang, rootLanguage);
+        }
+        rootLanguage.put(namespace, json);
+        initDefaultNamespaceIfNeeded(namespace);
+    }
+
     static boolean equalsCharSequence(CharSequence cs, CharSequence cs2) {
         return (cs2 == null && cs == null) || (cs != null && cs.equals(cs2));
+    }
+
+    public static class Loader {
+
+        private JSONObject mJSONObject;
+        private String mNameSpace;
+        private String mLang;
+        private I18Next mI18Next;
+
+        public Loader(I18Next i18Next) {
+            mI18Next = i18Next;
+        }
+
+        public Loader from(Context context, int resource) throws JSONException, IOException {
+            String json = null;
+            InputStream inputStream;
+            try {
+                inputStream = context.getResources().openRawResource(resource);
+            } catch (Exception ex) {
+                try {
+                    json = context.getResources().getString(resource);
+                } catch (Exception ex2) {
+                }
+                inputStream = null;
+            }
+            if (json == null && inputStream != null) {
+                InputStreamReader is = new InputStreamReader(inputStream);
+                StringBuilder sb = new StringBuilder();
+                BufferedReader br = new BufferedReader(is);
+                String read = br.readLine();
+                while (read != null) {
+                    sb.append(read);
+                    read = br.readLine();
+                }
+                json = sb.toString();
+            }
+            return from(json);
+        }
+
+        public Loader from(String json) throws JSONException {
+            return from(new JSONObject(json));
+        }
+
+        public Loader from(JSONObject jsonObject) {
+            mJSONObject = jsonObject;
+            return this;
+        }
+
+        public Loader namespace(String nameSpace) {
+            mNameSpace = nameSpace;
+            return this;
+        }
+
+        public Loader lang(String lang) {
+            mLang = lang;
+            return this;
+        }
+
+        public void load() throws JSONException {
+            if (mLang == null) {
+                mLang = mI18Next.mOptions.getLanguage();
+            }
+            if (mNameSpace == null) {
+                mNameSpace = mI18Next.mOptions.getDefaultNamespace();
+                if (mNameSpace == null) {
+                    mNameSpace = "DEFAULT_NAMESPACE";
+                }
+            }
+            mI18Next.load(mLang, mNameSpace, mJSONObject);
+        }
     }
 }
