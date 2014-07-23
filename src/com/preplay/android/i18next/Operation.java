@@ -1,11 +1,14 @@
 /**
- * 
+ *
  */
 package com.preplay.android.i18next;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * @author stan
- * 
  */
 public interface Operation {
 
@@ -219,25 +222,50 @@ public interface Operation {
 
     public static class Interpolation implements PostOperation {
         private StringBuffer mStringBuffer = new StringBuffer();
-        private CharSequence mTarget;
-        private CharSequence mReplacement;
+        private Map<String, Object> mReplacementMap;
+
+        private static Map<String, Object> getReplacementMap(CharSequence target, CharSequence replacement) {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put(target.toString(), replacement);
+            return map;
+        }
 
         public Interpolation(CharSequence target, CharSequence replacement) {
-            mTarget = target;
-            mReplacement = replacement;
+            this(getReplacementMap(target, replacement));
+        }
+
+        public Interpolation(Map<String, Object> replacementMap) {
+            mReplacementMap = replacementMap;
         }
 
         @Override
         public String postProcess(String source) {
-            if (source != null && mTarget != null && mTarget.length() > 0) {
+            if (source != null) {
                 Options options = I18Next.getInstance().getOptions();
                 String interpolationPrefix = options.getInterpolationPrefix();
+                int interpolationPrefixLength = interpolationPrefix.length();
                 String interpolationSuffix = options.getInterpolationSuffix();
-                mStringBuffer.setLength(0);
-                mStringBuffer.append(interpolationPrefix);
-                mStringBuffer.append(mTarget);
-                mStringBuffer.append(interpolationSuffix);
-                source = source.replace(mStringBuffer.toString(), mReplacement == null ? "" : mReplacement);
+
+                int lastIndexOfInterpolationPrefix = -1;
+                while (true) {
+                    int indexOfInterpolationPrefix = source.indexOf(interpolationPrefix);
+                    if (indexOfInterpolationPrefix < 0 || lastIndexOfInterpolationPrefix == indexOfInterpolationPrefix) {
+                        break;
+                    } else {
+                        int indexOfInterpolationSuffix = source.indexOf(interpolationSuffix, indexOfInterpolationPrefix + interpolationPrefixLength);
+                        if (indexOfInterpolationSuffix < 0) {
+                            break;
+                        }
+                        String target = source.substring(indexOfInterpolationPrefix + interpolationPrefixLength, indexOfInterpolationSuffix);
+                        Object replacement = getObject(target);
+                        mStringBuffer.setLength(0);
+                        mStringBuffer.append(interpolationPrefix);
+                        mStringBuffer.append(target);
+                        mStringBuffer.append(interpolationSuffix);
+                        source = source.replace(mStringBuffer.toString(), replacement == null ? "" : replacement.toString());
+                        lastIndexOfInterpolationPrefix = indexOfInterpolationPrefix;
+                    }
+                }
             }
             return source;
         }
@@ -245,9 +273,29 @@ public interface Operation {
         @Override
         public boolean equals(Object o) {
             if (o instanceof Interpolation) {
-                return I18Next.equalsCharSequence(mTarget, ((Interpolation) o).mTarget) && I18Next.equalsCharSequence(mReplacement, ((Interpolation) o).mReplacement);
+                return mReplacementMap != null && mReplacementMap.equals(((Interpolation) o).mReplacementMap);
             }
             return false;
+        }
+
+        private Object getObject(String target) {
+            if (target != null) {
+                String[] targetParts = target.split("\\.");
+                if (targetParts != null && targetParts.length > 0) {
+                    Object rootObject = mReplacementMap;
+                    for (int i = 0; i < targetParts.length; i++) {
+                        String part = targetParts[i];
+                        if (rootObject instanceof Map<?, ?>) {
+                            rootObject = ((Map<?, ?>) rootObject).get(part);
+                        } else {
+                            I18Next.getInstance().log(I18Next.LogMode.WARNING, "Impossible to replace '%s': not found", target);
+                            return null;
+                        }
+                    }
+                    return rootObject;
+                }
+            }
+            return null;
         }
     }
 
