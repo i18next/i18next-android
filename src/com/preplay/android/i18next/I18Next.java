@@ -3,19 +3,18 @@
  */
 package com.preplay.android.i18next;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Iterator;
-import java.util.regex.Pattern;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.util.Log;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.regex.Pattern;
 
 /**
  * @author stan
@@ -53,7 +52,7 @@ public class I18Next {
         return new Loader(this);
     }
 
-    private enum LogMode {
+    enum LogMode {
         VERBOSE, WARNING, ERROR;
     }
 
@@ -88,11 +87,11 @@ public class I18Next {
         return mOptions;
     }
 
-    private void log(String raw, Object... args) {
+    void log(String raw, Object... args) {
         log(LogMode.VERBOSE, raw, args);
     }
 
-    private void log(LogMode logMode, String raw, Object... args) {
+    void log(LogMode logMode, String raw, Object... args) {
         if (mOptions.isDebugMode()) {
             if (args != null) {
                 raw = String.format(raw, args);
