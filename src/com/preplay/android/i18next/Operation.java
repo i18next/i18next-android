@@ -258,11 +258,13 @@ public interface Operation {
                         }
                         String target = source.substring(indexOfInterpolationPrefix + interpolationPrefixLength, indexOfInterpolationSuffix);
                         Object replacement = getObject(target);
-                        mStringBuffer.setLength(0);
-                        mStringBuffer.append(interpolationPrefix);
-                        mStringBuffer.append(target);
-                        mStringBuffer.append(interpolationSuffix);
-                        source = source.replace(mStringBuffer.toString(), replacement == null ? "" : replacement.toString());
+                        if(replacement != null) {
+                            mStringBuffer.setLength(0);
+                            mStringBuffer.append(interpolationPrefix);
+                            mStringBuffer.append(target);
+                            mStringBuffer.append(interpolationSuffix);
+                            source = source.replace(mStringBuffer.toString(), replacement == null ? "" : replacement.toString());
+                        }
                         lastIndexOfInterpolationPrefix = indexOfInterpolationPrefix;
                     }
                 }
