@@ -242,30 +242,32 @@ public interface Operation {
         public String postProcess(String source) {
             if (source != null) {
                 Options options = I18Next.getInstance().getOptions();
-                String interpolationPrefix = options.getInterpolationPrefix();
-                int interpolationPrefixLength = interpolationPrefix.length();
-                String interpolationSuffix = options.getInterpolationSuffix();
+                String prefix = options.getInterpolationPrefix();
+                int prefixLength = prefix.length();
+                String suffix = options.getInterpolationSuffix();
 
-                int lastIndexOfInterpolationPrefix = -1;
+                int lastIndexPrefix = -1;
                 while (true) {
-                    int indexOfInterpolationPrefix = source.indexOf(interpolationPrefix);
-                    if (indexOfInterpolationPrefix < 0 || lastIndexOfInterpolationPrefix == indexOfInterpolationPrefix) {
+                    int prefixIndex = source.indexOf(prefix, lastIndexPrefix);
+                    if (prefixIndex < 0) {
                         break;
                     } else {
-                        int indexOfInterpolationSuffix = source.indexOf(interpolationSuffix, indexOfInterpolationPrefix + interpolationPrefixLength);
-                        if (indexOfInterpolationSuffix < 0) {
+                        int suffixIndex = source.indexOf(suffix, prefixIndex + prefixLength);
+                        if (suffixIndex < 0) {
                             break;
                         }
-                        String target = source.substring(indexOfInterpolationPrefix + interpolationPrefixLength, indexOfInterpolationSuffix);
+                        String target = source.substring(prefixIndex + prefixLength, suffixIndex);
                         Object replacement = getObject(target);
-                        if(replacement != null) {
+                        if (replacement == null) {
+                            lastIndexPrefix = suffixIndex + 1; // skip this replacement
+                        } else {
                             mStringBuffer.setLength(0);
-                            mStringBuffer.append(interpolationPrefix);
+                            mStringBuffer.append(prefix);
                             mStringBuffer.append(target);
-                            mStringBuffer.append(interpolationSuffix);
+                            mStringBuffer.append(suffix);
                             source = source.replace(mStringBuffer.toString(), replacement == null ? "" : replacement.toString());
+                            lastIndexPrefix = 0;
                         }
-                        lastIndexOfInterpolationPrefix = indexOfInterpolationPrefix;
                     }
                 }
             }
