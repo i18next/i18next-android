@@ -10,5 +10,9 @@ android {
       java.srcDirs = ['src']
       res.srcDirs = ['res']
     }
+
+    androidTest {
+      setRoot('src/com/preplay/android/i18next/test')
+    }
   }
 }
