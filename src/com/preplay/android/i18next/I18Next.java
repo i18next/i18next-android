@@ -164,7 +164,8 @@ public class I18Next {
         String innerProcessValue = null;
         if (keys != null && keys.length > 0) {
             for (String key : keys) {
-                innerProcessValue = innerProcessing(getValueRaw(key, operation));
+                String rawValue = getValueRaw(key, operation);
+                innerProcessValue = transformRawValue(operation, rawValue);
                 if (innerProcessValue != null) {
                     break;
                 } else if (mOptions.isDebugMode()) {
@@ -172,8 +173,19 @@ public class I18Next {
                 }
             }
         }
+        return innerProcessValue;
+    }
+
+    private String transformRawValue(Operation operation, String rawValue) {
+        String innerProcessValue;
         if (operation instanceof Operation.PostOperation) {
-            innerProcessValue = ((Operation.PostOperation) operation).postProcess(innerProcessValue);
+            rawValue = ((Operation.PostOperation) operation).postProcess(rawValue);
+        }
+        String rawValueNestingReplaced = getRawWithNestingReplaced(rawValue, operation);
+        if (rawValueNestingReplaced != null) {
+            innerProcessValue = transformRawValue(operation, rawValueNestingReplaced);
+        } else {
+            innerProcessValue = rawValue;
         }
         return innerProcessValue;
     }
@@ -266,7 +278,7 @@ public class I18Next {
         return lang;
     }
 
-    private String innerProcessing(String raw) {
+    private String getRawWithNestingReplaced(String raw, Operation operation) {
         // nesting
         String reusePrefix = mOptions.getReusePrefix();
         String reuseSuffix = mOptions.getReuseSuffix();
@@ -277,9 +289,8 @@ public class I18Next {
                 if (indexOfSuffix > 0) {
                     // we've found a prefix and a suffix
                     String param = raw.substring(indexOfPrefix, indexOfSuffix + reuseSuffix.length());
-                    String replacement = null;
                     String paramTrim = param.substring(reusePrefix.length(), indexOfSuffix - indexOfPrefix);
-                    replacement = t(paramTrim);
+                    String replacement = t(paramTrim, operation);
                     if (replacement == null) {
                         replacement = "";
                     }
@@ -287,12 +298,16 @@ public class I18Next {
                     raw = raw.replace(param, replacement);
                     if (hashBefore != raw.hashCode()) {
                         // the string has been changed, try to change it again
-                        raw = innerProcessing(raw);
+                        String rawWithSubReplacement = getRawWithNestingReplaced(raw, operation);
+                        if (rawWithSubReplacement != null) {
+                            raw = rawWithSubReplacement;
+                        }
                     }
+                    return raw;
                 }
             }
         }
-        return raw;
+        return null;
     }
 
 

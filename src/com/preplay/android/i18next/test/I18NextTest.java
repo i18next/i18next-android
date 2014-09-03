@@ -110,6 +110,16 @@ public class I18NextTest extends TestCase {
     }
 
     @SmallTest
+    public void testShouldReturnValueAfterMultipleReplacementAndNesting() {
+        String resFinal = "fin";
+        Map<String, Object> replacements = new HashMap<String, Object>();
+        replacements.put("param", "replace_int");
+        replacements.put("param2", "replace_after");
+        replacements.put("param3", resFinal);
+        assertEquals(resFinal, I18Next.getInstance().t("app.replace_before", new Operation.Interpolation(replacements)));
+    }
+
+    @SmallTest
     public void testShouldReturnValueWithoutOrDefaultNamespace() {
         assertEquals("i18next", I18Next.getInstance().t("app.name"));
     }
