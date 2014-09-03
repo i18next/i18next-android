@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.preplay.android.i18next.test;
 
 import junit.framework.TestCase;
@@ -14,12 +11,10 @@ import android.util.Log;
 import com.preplay.android.i18next.I18Next;
 import com.preplay.android.i18next.Operation;
 
-/**
- * @author stan
- * 
- */
+import java.util.HashMap;
+import java.util.Map;
+
 public class I18NextTest extends TestCase {
-    /** Used locally to tag Logs */
     private static final String TAG = I18NextTest.class.getSimpleName();
 
     private String mPreviousDefaultNamespace;
@@ -45,27 +40,29 @@ public class I18NextTest extends TestCase {
         }
         mPreviousDefaultNamespace = I18Next.getInstance().getOptions().getDefaultNamespace();
         try {
-            // {
-            // "app" : {
-            // "name" : "i18next",
-            // "insert" : "you are __youAre__",
-            // "sprintf" : "%s, %s, %s and %s",
-            // "sprintf2" : "%d %f",
-            // "child" : "__count__ child",
-            // "child_plural" : "__count__ children",
-            // "child2" : "a child",
-            // "child2_plural" : "some children",
-            // "area" : "Area 51",
-            // "area2" : "Area 52",
-            // "district" : "District 9 is more fun than $t(app.area)",
-            // "district_double" : "District 9 is more fun than $t(app.area) and $t(app.area2)",
-            // "friend_context" : "A friend",
-            // "friend_context_male" : "A boyfriend",
-            // "friend_context_female" : "A girlfriend",
-            // "pack_of" : "Pack of __count__"
-            // }
-            // }
-            String content = "{\"app\":{\"name\":\"i18next\",\"insert\":\"you are __youAre__\",\"sprintf\":\"%s, %s, %s and %s\",\"sprintf2\":\"%d %f\",\"child\":\"__count__ child\",\"child_plural\":\"__count__ children\",\"child2\":\"a child\",\"child2_plural\":\"some children\",\"area\":\"Area 51\",\"area2\":\"Area 52\",\"district\":\"District 9 is more fun than $t(app.area)\",\"district_double\" : \"District 9 is more fun than $t(app.area) and $t(app.area2)\",\"friend_context\":\"A friend\",\"friend_context_male\":\"A boyfriend\",\"friend_context_female\":\"A girlfriend\",\"pack_of\":\"Pack of __count__\"}}";
+            String content = "{"
+                    + "  \"app\": {"
+                    + "    \"name\": \"i18next\","
+                    + "    \"insert\": \"you are __youAre__\","
+                    + "    \"sprintf\": \"%s, %s, %s and %s\","
+                    + "    \"sprintf2\": \"%d %f\","
+                    + "    \"child\": \"__count__ child\","
+                    + "    \"child_plural\": \"__count__ children\","
+                    + "    \"child2\": \"a child\","
+                    + "    \"child2_plural\": \"some children\","
+                    + "    \"area\": \"Area 51\","
+                    + "    \"area2\": \"Area 52\","
+                    + "    \"district\": \"District 9 is more fun than $t(app.area)\","
+                    + "    \"district_double\": \"District 9 is more fun than $t(app.area) and $t(app.area2)\","
+                    + "    \"friend_context\": \"A friend\","
+                    + "    \"friend_context_male\": \"A boyfriend\","
+                    + "    \"friend_context_female\": \"A girlfriend\","
+                    + "    \"pack_of\": \"Pack of __count__\","
+                    + "    \"replace_before\": \"$t(app.__param__)\","
+                    + "    \"replace_int\": \"$t(app.__param2__)\","
+                    + "    \"replace_after\": \"__param3__\""
+                    + "  }"
+                    + "}";
             I18Next.getInstance().loader().from(content).namespace("common_test").load();
         } catch (JSONException e) {
             Log.w(TAG, e);
@@ -96,8 +93,8 @@ public class I18NextTest extends TestCase {
 
     @SmallTest
     public void testShouldAcceptCandidateKey() {
-        String[] listKeyValid = { "test.dot", "test.double.dot", "test.test_underscore", "test.test_double_underscore", "test.test_double_underscore.dot", "test.dot_double_underscore", "test.test2" };
-        String[] listKeyInvalid = { "test", "space not accepted", "double..dot" };
+        String[] listKeyValid = {"test.dot", "test.double.dot", "test.test_underscore", "test.test_double_underscore", "test.test_double_underscore.dot", "test.dot_double_underscore", "test.test2"};
+        String[] listKeyInvalid = {"test", "space not accepted", "double..dot"};
         for (String key : listKeyValid) {
             assertTrue("The key '" + key + "' should be accepted as a valid key", I18Next.isI18NextKeyCandidate(key));
         }
