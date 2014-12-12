@@ -1,5 +1,8 @@
 package com.preplay.android.i18next.test;
 
+import com.preplay.android.i18next.I18Next;
+import com.preplay.android.i18next.Operation;
+
 import junit.framework.TestCase;
 
 import org.json.JSONException;
@@ -8,21 +11,21 @@ import android.annotation.SuppressLint;
 import android.test.suitebuilder.annotation.SmallTest;
 import android.util.Log;
 
-import com.preplay.android.i18next.I18Next;
-import com.preplay.android.i18next.Operation;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class I18NextTest extends TestCase {
+
     private static final String TAG = I18NextTest.class.getSimpleName();
 
     private String mPreviousDefaultNamespace;
+
     private String mPreviousFallbackLanguage;
 
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
+
         if (mPreviousDefaultNamespace != null) {
             I18Next.getInstance().getOptions().setDefaultNamespace(mPreviousDefaultNamespace);
         }
@@ -32,13 +35,10 @@ public class I18NextTest extends TestCase {
     }
 
     @Override
-    public void setUp() {
-        try {
-            super.setUp();
-        } catch (Exception e) {
-            Log.w("TAG", e);
-        }
+    public void setUp() throws Exception {
+        super.setUp();
         mPreviousDefaultNamespace = I18Next.getInstance().getOptions().getDefaultNamespace();
+        mPreviousFallbackLanguage = I18Next.getInstance().getOptions().getFallbackLanguage();
         try {
             String content = "{"
                     + "  \"app\": {"
@@ -93,20 +93,25 @@ public class I18NextTest extends TestCase {
 
     @SmallTest
     public void testShouldAcceptCandidateKey() {
-        String[] listKeyValid = {"test.dot", "test.double.dot", "test.test_underscore", "test.test_double_underscore", "test.test_double_underscore.dot", "test.dot_double_underscore", "test.test2"};
+        String[] listKeyValid = {"test.dot", "test.double.dot", "test.test_underscore",
+                "test.test_double_underscore", "test.test_double_underscore.dot",
+                "test.dot_double_underscore", "test.test2"};
         String[] listKeyInvalid = {"test", "space not accepted", "double..dot"};
         for (String key : listKeyValid) {
-            assertTrue("The key '" + key + "' should be accepted as a valid key", I18Next.isI18NextKeyCandidate(key));
+            assertTrue("The key '" + key + "' should be accepted as a valid key",
+                    I18Next.isI18NextKeyCandidate(key));
         }
         for (String key : listKeyInvalid) {
-            assertFalse("The key '" + key + "' should not be accepted as a valid key", I18Next.isI18NextKeyCandidate(key));
+            assertFalse("The key '" + key + "' should not be accepted as a valid key",
+                    I18Next.isI18NextKeyCandidate(key));
         }
     }
 
     @SmallTest
     public void testShouldReturnValueDefault() {
         assertNull(I18Next.getInstance().t("notexist"));
-        assertEquals("default", I18Next.getInstance().t("notexist", new Operation.DefaultValue("default")));
+        assertEquals("default",
+                I18Next.getInstance().t("notexist", new Operation.DefaultValue("default")));
     }
 
     @SmallTest
@@ -116,7 +121,8 @@ public class I18NextTest extends TestCase {
         replacements.put("param", "replace_int");
         replacements.put("param2", "replace_after");
         replacements.put("param3", resFinal);
-        assertEquals(resFinal, I18Next.getInstance().t("app.replace_before", new Operation.Interpolation(replacements)));
+        assertEquals(resFinal, I18Next.getInstance()
+                .t("app.replace_before", new Operation.Interpolation(replacements)));
     }
 
     @SmallTest
@@ -136,19 +142,23 @@ public class I18NextTest extends TestCase {
 
     @SmallTest
     public void testShouldReturnValueInterpolation() {
-        assertEquals("you are great", I18Next.getInstance().t("app.insert", new Operation.Interpolation("youAre", "great")));
+        assertEquals("you are great", I18Next.getInstance()
+                .t("app.insert", new Operation.Interpolation("youAre", "great")));
     }
 
     @SmallTest
     public void testShouldReturnValueSprintF() {
-        assertEquals("a, b, c and d", I18Next.getInstance().t("app.sprintf", new Operation.SPrintF("a", "b", "c", "d")));
+        assertEquals("a, b, c and d",
+                I18Next.getInstance().t("app.sprintf", new Operation.SPrintF("a", "b", "c", "d")));
     }
 
     @SuppressLint("DefaultLocale")
     @SmallTest
     public void testShouldReturnValueSprintFWithNumber() {
-        assertEquals(String.format("%d %f", 1, 1.2f), I18Next.getInstance().t("app.sprintf2", new Operation.SPrintF(1, 1.2f)));
-        assertEquals(String.format("%d %f", 1, 1.2f), I18Next.getInstance().t("app.sprintf2", new Operation.SPrintF(1, 1.2d)));
+        assertEquals(String.format("%d %f", 1, 1.2f),
+                I18Next.getInstance().t("app.sprintf2", new Operation.SPrintF(1, 1.2f)));
+        assertEquals(String.format("%d %f", 1, 1.2f),
+                I18Next.getInstance().t("app.sprintf2", new Operation.SPrintF(1, 1.2d)));
     }
 
     @SmallTest
@@ -156,7 +166,8 @@ public class I18NextTest extends TestCase {
         assertEquals("1 child", I18Next.getInstance().t("app.child", new Operation.Plural(1)));
         assertEquals("3 children", I18Next.getInstance().t("app.child", new Operation.Plural(3)));
         assertEquals("a child", I18Next.getInstance().t("app.child2", new Operation.Plural(1)));
-        assertEquals("some children", I18Next.getInstance().t("app.child2", new Operation.Plural(3)));
+        assertEquals("some children",
+                I18Next.getInstance().t("app.child2", new Operation.Plural(3)));
     }
 
     @SmallTest
@@ -168,14 +179,19 @@ public class I18NextTest extends TestCase {
 
     @SmallTest
     public void testShouldReturnValueNesting() {
-        assertEquals("District 9 is more fun than Area 51", I18Next.getInstance().t("app.district"));
-        assertEquals("District 9 is more fun than Area 51 and Area 52", I18Next.getInstance().t("app.district_double"));
+        assertEquals("District 9 is more fun than Area 51",
+                I18Next.getInstance().t("app.district"));
+        assertEquals("District 9 is more fun than Area 51 and Area 52",
+                I18Next.getInstance().t("app.district_double"));
     }
 
     @SmallTest
     public void testShouldReturnValueContext() {
-        assertEquals("A friend", I18Next.getInstance().t("app.friend_context", new Operation.Context("")));
-        assertEquals("A boyfriend", I18Next.getInstance().t("app.friend_context", new Operation.Context("male")));
-        assertEquals("A girlfriend", I18Next.getInstance().t("app.friend_context", new Operation.Context("female")));
+        assertEquals("A friend",
+                I18Next.getInstance().t("app.friend_context", new Operation.Context("")));
+        assertEquals("A boyfriend",
+                I18Next.getInstance().t("app.friend_context", new Operation.Context("male")));
+        assertEquals("A girlfriend",
+                I18Next.getInstance().t("app.friend_context", new Operation.Context("female")));
     }
 }
