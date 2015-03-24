@@ -242,6 +242,7 @@ public interface Operation {
         public String postProcess(String source) {
             if (source != null) {
                 Options options = I18Next.getInstance().getOptions();
+                String reusePrefix = options.getReusePrefix();
                 String prefix = options.getInterpolationPrefix();
                 int prefixLength = prefix.length();
                 String suffix = options.getInterpolationSuffix();
@@ -258,8 +259,9 @@ public interface Operation {
                         }
                         String target = source.substring(prefixIndex + prefixLength, suffixIndex);
                         Object replacement = getObject(target);
-                        if (replacement == null) {
-                            lastIndexPrefix = suffixIndex + 1; // skip this replacement
+                        if (replacement == null && reusePrefix != null
+                                && source.contains(reusePrefix)) {
+                            lastIndexPrefix = suffixIndex + 1; // skip this replacement if nested coming
                         } else {
                             mStringBuffer.setLength(0);
                             mStringBuffer.append(prefix);
