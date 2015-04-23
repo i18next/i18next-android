@@ -60,7 +60,9 @@ public class I18NextTest extends TestCase {
                     + "    \"pack_of\": \"Pack of __count__\","
                     + "    \"replace_before\": \"$t(app.__param__)\","
                     + "    \"replace_int\": \"$t(app.__param2__)\","
-                    + "    \"replace_after\": \"__param3__\""
+                    + "    \"replace_after\": \"__param3__\","
+                    + "    \"replace_with_count\": \"$t(app.child, {\\\"count\\\": 5})\","
+                    + "    \"replace_with_count_and_replace\": \"$t(app.child, {\\\"count\\\": __param__})\""
                     + "  }"
                     + "}";
             I18Next.getInstance().loader().from(content).namespace("common_test").load();
@@ -123,6 +125,13 @@ public class I18NextTest extends TestCase {
         replacements.put("param3", resFinal);
         assertEquals(resFinal, I18Next.getInstance()
                 .t("app.replace_before", new Operation.Interpolation(replacements)));
+    }
+
+    @SmallTest
+    public void testShouldReturnValueAfterReplacementNestingAndCount() {
+        assertEquals("5 children", I18Next.getInstance().t("app.replace_with_count"));
+        assertEquals("11 children", I18Next.getInstance().t("app.replace_with_count_and_replace",
+                new Operation.Interpolation("param", "11")));
     }
 
     @SmallTest

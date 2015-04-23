@@ -5,6 +5,7 @@ package com.preplay.android.i18next;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -29,6 +30,8 @@ public class I18Next {
 
     private static final String SEPARATOR_LANGUAGE_COUNTRY = "_";
     private static final String WRONG_SEPARATOR_LANGUAGE_COUNTRY = "_";
+
+    private static final String COMMA = ",";
 
     private Options mOptions = new Options();
     private JSONObject mRootObject = new JSONObject();
@@ -290,6 +293,40 @@ public class I18Next {
                     // we've found a prefix and a suffix
                     String param = raw.substring(indexOfPrefix, indexOfSuffix + reuseSuffix.length());
                     String paramTrim = param.substring(reusePrefix.length(), indexOfSuffix - indexOfPrefix);
+
+                    // nested replacement
+                    int commaIndex = paramTrim.indexOf(COMMA);
+                    while (commaIndex > 0 && paramTrim.length() > commaIndex + 1) {
+                        String textLeft = paramTrim.substring(commaIndex + 1);
+                        try {
+                            JSONObject jsonObject = new JSONObject(textLeft);
+                            String countParam = jsonObject.optString("count");
+                            if (!TextUtils.isEmpty(countParam)) {
+                                String countParamWithReplace
+                                        = getRawWithNestingReplaced(countParam, operation);
+                                if (countParamWithReplace != null) {
+                                    countParam = countParamWithReplace;
+                                }
+                                paramTrim = paramTrim.substring(0, commaIndex);
+                                try {
+                                    int countParamInt = Integer.parseInt(countParam);
+                                    Operation.Plural replacePlural
+                                            = new Operation.Plural(countParamInt);
+                                    if (operation == null) {
+                                        operation = replacePlural;
+                                    } else {
+                                        operation = new Operation.MultiPostProcessing(
+                                                replacePlural, operation);
+                                    }
+                                    break;
+                                } catch (NumberFormatException ex) {
+                                }
+                            }
+                        } catch (JSONException e) {
+                            commaIndex = paramTrim.indexOf(COMMA, commaIndex + 1);
+                        }
+                    }
+
                     String replacement = t(paramTrim, operation);
                     if (replacement == null) {
                         replacement = "";
