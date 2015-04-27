@@ -97,8 +97,17 @@ public interface Operation {
         private int mCount;
         private Interpolation mInterpolation;
 
+        public Plural(float count) {
+            this("count", count);
+        }
+
         public Plural(int count) {
             this("count", count);
+        }
+
+        public Plural(String key, float count) {
+            mInterpolation = new Interpolation(key, Float.toString(count));
+            mCount = Math.round(count);
         }
 
         public Plural(String key, int count) {
