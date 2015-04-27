@@ -309,9 +309,14 @@ public class I18Next {
                                 }
                                 paramTrim = paramTrim.substring(0, commaIndex);
                                 try {
-                                    int countParamInt = Integer.parseInt(countParam);
-                                    Operation.Plural replacePlural
-                                            = new Operation.Plural(countParamInt);
+                                    Operation.Plural replacePlural;
+                                    try {
+                                        replacePlural
+                                                = new Operation.Plural(Integer.parseInt(countParam));
+                                    } catch (NumberFormatException ex) {
+                                        replacePlural
+                                                = new Operation.Plural(Float.parseFloat(countParam));
+                                    }
                                     if (operation == null) {
                                         operation = replacePlural;
                                     } else {
