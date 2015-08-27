@@ -1,10 +1,10 @@
 buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.3.1'
-    }
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'com.android.tools.build:gradle:1.3.1'
+  }
 }
 
 apply plugin: 'com.android.library'
@@ -13,15 +13,17 @@ android {
   compileSdkVersion 15
   buildToolsVersion '22.0.1'
 
-  sourceSets {
-    main {
-      manifest.srcFile 'AndroidManifest.xml'
-      java.srcDirs = ['src']
-      res.srcDirs = ['res']
-    }
-
-    androidTest {
-      setRoot('src/com/preplay/android/i18next/test')
-    }
+  testOptions {
+    unitTests.returnDefaultValues = true
   }
 }
+
+dependencies {
+  repositories {
+    mavenCentral()
+  }
+  // Unit testing dependencies
+  testCompile 'junit:junit:4.12'
+  testCompile 'org.json:json:20141113'
+}
+

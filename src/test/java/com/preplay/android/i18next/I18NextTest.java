@@ -1,4 +1,4 @@
-package com.preplay.android.i18next.test;
+package com.preplay.android.i18next;
 
 import com.preplay.android.i18next.I18Next;
 import com.preplay.android.i18next.Operation;
