@@ -1,5 +1,6 @@
-i18next-android
-===============
+# i18next-android
+
+[![Build Status](https://travis-ci.org/preplay/i18next-android.svg)](https://travis-ci.org/preplay/i18next-android)
 
 i18next-android is an Android portage of the library [i18next](http://i18next.com/).
 
