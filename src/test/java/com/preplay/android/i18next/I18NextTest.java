@@ -1,20 +1,23 @@
 package com.preplay.android.i18next;
 
-import com.preplay.android.i18next.I18Next;
-import com.preplay.android.i18next.Operation;
-
-import junit.framework.TestCase;
+import android.annotation.SuppressLint;
+import android.util.Log;
 
 import org.json.JSONException;
-
-import android.annotation.SuppressLint;
-import android.test.suitebuilder.annotation.SmallTest;
-import android.util.Log;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class I18NextTest extends TestCase {
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+public class I18NextTest {
 
     private static final String TAG = I18NextTest.class.getSimpleName();
 
@@ -22,21 +25,8 @@ public class I18NextTest extends TestCase {
 
     private String mPreviousFallbackLanguage;
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-
-        if (mPreviousDefaultNamespace != null) {
-            I18Next.getInstance().getOptions().setDefaultNamespace(mPreviousDefaultNamespace);
-        }
-        if (mPreviousFallbackLanguage != null) {
-            I18Next.getInstance().getOptions().setFallbackLanguage(mPreviousFallbackLanguage);
-        }
-    }
-
-    @Override
+    @Before
     public void setUp() throws Exception {
-        super.setUp();
         mPreviousDefaultNamespace = I18Next.getInstance().getOptions().getDefaultNamespace();
         mPreviousFallbackLanguage = I18Next.getInstance().getOptions().getFallbackLanguage();
         try {
@@ -88,13 +78,23 @@ public class I18NextTest extends TestCase {
         I18Next.getInstance().getOptions().setDefaultNamespace("common_test");
     }
 
-    @SmallTest
-    public void testShouldGetLanguageFallback() {
+    @After
+    public void tearDown() throws Exception {
+        if (mPreviousDefaultNamespace != null) {
+            I18Next.getInstance().getOptions().setDefaultNamespace(mPreviousDefaultNamespace);
+        }
+        if (mPreviousFallbackLanguage != null) {
+            I18Next.getInstance().getOptions().setFallbackLanguage(mPreviousFallbackLanguage);
+        }
+    }
+
+    @Test
+    public void shouldGetLanguageFallback() {
         assertEquals("i18nextspecific in ZZ", I18Next.getInstance().t("app.name_on_this_language"));
     }
 
-    @SmallTest
-    public void testShouldAcceptCandidateKey() {
+    @Test
+    public void shouldAcceptCandidateKey() {
         String[] listKeyValid = {"test.dot", "test.double.dot", "test.test_underscore",
                 "test.test_double_underscore", "test.test_double_underscore.dot",
                 "test.dot_double_underscore", "test.test2"};
@@ -109,15 +109,15 @@ public class I18NextTest extends TestCase {
         }
     }
 
-    @SmallTest
-    public void testShouldReturnValueDefault() {
+    @Test
+    public void shouldReturnValueDefault() {
         assertNull(I18Next.getInstance().t("notexist"));
         assertEquals("default",
                 I18Next.getInstance().t("notexist", new Operation.DefaultValue("default")));
     }
 
-    @SmallTest
-    public void testShouldReturnValueAfterMultipleReplacementAndNesting() {
+    @Test
+    public void shouldReturnValueAfterMultipleReplacementAndNesting() {
         String resFinal = "fin";
         Map<String, Object> replacements = new HashMap<String, Object>();
         replacements.put("param", "replace_int");
@@ -127,51 +127,51 @@ public class I18NextTest extends TestCase {
                 .t("app.replace_before", new Operation.Interpolation(replacements)));
     }
 
-    @SmallTest
-    public void testShouldReturnValueAfterReplacementNestingAndCount() {
+    @Test
+    public void shouldReturnValueAfterReplacementNestingAndCount() {
         assertEquals("5 children", I18Next.getInstance().t("app.replace_with_count"));
         assertEquals("11 children", I18Next.getInstance().t("app.replace_with_count_and_replace",
                 new Operation.Interpolation("param", "11")));
     }
 
-    @SmallTest
-    public void testShouldReturnValueWithoutOrDefaultNamespace() {
+    @Test
+    public void shouldReturnValueWithoutOrDefaultNamespace() {
         assertEquals("i18next", I18Next.getInstance().t("app.name"));
     }
 
-    @SmallTest
-    public void testShouldReturnValueWithNamespace() {
+    @Test
+    public void shouldReturnValueWithNamespace() {
         assertEquals("i18nextspecific", I18Next.getInstance().t("specific:app.name"));
     }
 
-    @SmallTest
-    public void testShouldReturnValueMultiKey() {
+    @Test
+    public void shouldReturnValueMultiKey() {
         assertEquals("i18next", I18Next.getInstance().t("notexist", "app.name"));
     }
 
-    @SmallTest
-    public void testShouldReturnValueInterpolation() {
+    @Test
+    public void shouldReturnValueInterpolation() {
         assertEquals("you are great", I18Next.getInstance()
                 .t("app.insert", new Operation.Interpolation("youAre", "great")));
     }
 
-    @SmallTest
-    public void testShouldReturnValueSprintF() {
+    @Test
+    public void shouldReturnValueSprintF() {
         assertEquals("a, b, c and d",
                 I18Next.getInstance().t("app.sprintf", new Operation.SPrintF("a", "b", "c", "d")));
     }
 
     @SuppressLint("DefaultLocale")
-    @SmallTest
-    public void testShouldReturnValueSprintFWithNumber() {
+    @Test
+    public void shouldReturnValueSprintFWithNumber() {
         assertEquals(String.format("%d %f", 1, 1.2f),
                 I18Next.getInstance().t("app.sprintf2", new Operation.SPrintF(1, 1.2f)));
         assertEquals(String.format("%d %f", 1, 1.2f),
                 I18Next.getInstance().t("app.sprintf2", new Operation.SPrintF(1, 1.2d)));
     }
 
-    @SmallTest
-    public void testShouldReturnValuePlural() {
+    @Test
+    public void shouldReturnValuePlural() {
         assertEquals("1 child", I18Next.getInstance().t("app.child", new Operation.Plural(1)));
         assertEquals("3 children", I18Next.getInstance().t("app.child", new Operation.Plural(3)));
         assertEquals("a child", I18Next.getInstance().t("app.child2", new Operation.Plural(1)));
@@ -179,23 +179,23 @@ public class I18NextTest extends TestCase {
                 I18Next.getInstance().t("app.child2", new Operation.Plural(3)));
     }
 
-    @SmallTest
-    public void testShouldReturnValuePluralNotSpecified() {
+    @Test
+    public void shouldReturnValuePluralNotSpecified() {
         assertEquals("Pack of 1", I18Next.getInstance().t("app.pack_of", new Operation.Plural(1)));
         assertEquals("Pack of 3", I18Next.getInstance().t("app.pack_of", new Operation.Plural(3)));
         assertEquals("Pack of 0", I18Next.getInstance().t("app.pack_of", new Operation.Plural(0)));
     }
 
-    @SmallTest
-    public void testShouldReturnValueNesting() {
+    @Test
+    public void shouldReturnValueNesting() {
         assertEquals("District 9 is more fun than Area 51",
                 I18Next.getInstance().t("app.district"));
         assertEquals("District 9 is more fun than Area 51 and Area 52",
                 I18Next.getInstance().t("app.district_double"));
     }
 
-    @SmallTest
-    public void testShouldReturnValueContext() {
+    @Test
+    public void shouldReturnValueContext() {
         assertEquals("A friend",
                 I18Next.getInstance().t("app.friend_context", new Operation.Context("")));
         assertEquals("A boyfriend",
