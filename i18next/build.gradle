@@ -55,7 +55,8 @@ install {
     pom {
       project {
         packaging 'aar'
-        name 'i18next translation library for Android'
+        name 'i18next-android'
+        description 'i18next internationalization library for Android'
         url siteUrl
         licenses {
           license {
