@@ -1,5 +1,8 @@
 apply plugin: 'com.android.library'
 
+version = '1.0.0'
+group = 'com.preplay.android'
+
 android {
   compileSdkVersion 15
   buildToolsVersion '22.0.1'
@@ -13,4 +16,86 @@ dependencies {
   // Unit testing dependencies
   testCompile 'junit:junit:4.12'
   testCompile 'org.json:json:20140107'
+}
+
+// Bintray publishing
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+def siteUrl = 'https://github.com/preplay/i18next-android'
+def gitUrl = 'https://github.com/preplay/i18next-android.git'
+
+bintray { 
+  // user and key come from the gradle.properties file in ~/.gradle
+  user = project.hasProperty('bintrayUser') ? bintrayUser : 'noUser'
+  key = project.hasProperty('bintrayKey') ? bintrayKey : 'noKey'
+  configurations = ['archives']
+  pkg {
+    repo = 'maven'
+    name = 'i18next-android'
+    //userOrg = user
+    licenses = ['MIT']
+    websiteUrl = siteUrl
+    vcsUrl = 'https://github.com/preplay/i18next-android.git'
+    labels = ['android', 'i18n', 'i18next', 'internationalization', 'localization', 'translation']
+    publicDownloadNumbers = true
+    publish = true
+    //attributes= ['a': ['ay1', 'ay2'], 'b': ['bee'], c: 'cee'] //Optional package-level attributes
+    // version {
+    //   name = '1.0-Final'
+    //   desc = 'Gradle Bintray Plugin 1.0 final'
+    //   vcsTag = '1.3.0'
+    //   attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
+    // }
+  }
+}
+
+install {
+  repositories.mavenInstaller {
+    pom {
+      project {
+        packaging 'aar'
+        name 'i18next translation library for Android'
+        url siteUrl
+        licenses {
+          license {
+            name 'MIT'
+            url 'http://opensource.org/licenses/MIT'
+          }
+        }
+        developers {
+          developer {
+            id 'stanko'
+            name 'Stan Kocken'
+            //email ''
+          }
+        }
+        scm {
+          connection gitUrl
+          developerConnection gitUrl
+          url siteUrl
+        }
+      }
+    }
+  }
+}
+
+task sourcesJar(type: Jar) {
+  from android.sourceSets.main.java.srcDirs
+  classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+  source = android.sourceSets.main.java.srcDirs
+  classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = 'javadoc'
+  from javadoc.destinationDir
+}
+
+artifacts {
+  archives javadocJar
+  archives sourcesJar
 }
