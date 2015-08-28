@@ -5,3 +5,4 @@ jdk:
 android:
   components:
   - build-tools-22.0.1
+script: ./gradlew test
