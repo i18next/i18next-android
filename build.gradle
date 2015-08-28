@@ -7,23 +7,8 @@ buildscript {
   }
 }
 
-apply plugin: 'com.android.library'
-
-android {
-  compileSdkVersion 15
-  buildToolsVersion '22.0.1'
-
-  testOptions {
-    unitTests.returnDefaultValues = true
-  }
-}
-
-dependencies {
+allprojects {
   repositories {
     jcenter()
   }
-  // Unit testing dependencies
-  testCompile 'junit:junit:4.12'
-  testCompile 'org.json:json:20140107'
 }
-
