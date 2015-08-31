@@ -33,13 +33,13 @@ I18Next i18next = I18Next.getInstance();
 
 ### Load data
 
-Start by get a Loader with:
+Start by getting a Loader with:
 
 ```java
 Loader loader = i18next.loader();
 ```
 
-After your set the namespace, the language and the data, you can apply the load by calling:
+After you've set the namespace, language and data, you can apply it by calling:
 
 ```java
 loader.load();
@@ -47,7 +47,7 @@ loader.load();
 
 #### Namespace
 
-To specify the namespace of the file that will be load:
+Specifying the namespace of the file to load:
 
 ```java
 loader.namespace(String namespace)
@@ -57,18 +57,18 @@ loader.namespace(String namespace)
 
 #### Language
 
-To specify the language of the file that will be load:
+Specifying the language of the file to load:
 
 ```java
 loader.lang(String lang)
 ```
 
-*Note: if you don't specify a language here, the default language of your device, or the forced language in the option if define is taken.*
+*Note: if you don't specify a language here, the default language of your device, or the forced language in the option if defined is taken.*
 
 #### Translation data
 
 Your translations are in a JSON file.
-This file can be load by different ways:
+This file can be loaded in different ways:
 
 ##### .json file in your ressources
 
@@ -109,13 +109,13 @@ i18next.loadFromPreference(SharedPreferences sharedPreference)
 
 ## Options
 
-The option of i18next can be access with:
+The options of i18next are accessed with:
 
 ```java
 Options options = i18next.getOptions()
 ```
 
-You can, for example, set the debug mode (to have more logs) with:
+You can, for example, enable debug mode (to have more logs) with:
 
 ```java
 options.setDebugMode(boolean debugMode)
@@ -134,7 +134,7 @@ You have also access to:
 
 ## Translation features
 
-Not all features of the i18next are currently supported.
+Not all features of the javascript implementation of i18next are currently supported.
 Here is the list from [the i18next website](http://i18next.com/pages/doc_features.html) and how to use them with this library.
 
 ### accessing resources
