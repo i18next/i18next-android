@@ -404,3 +404,7 @@ i18n.t("friend", new Operation.Plural(0)); // -> A friend
 i18n.t("friend", new Operation.Context("male")); // -> A boyfriend
 i18n.t("friend", new Operation.Context("female")); // -> A girlfriend
 ```
+
+## Credits
+
+[i18next](http://i18next.com/) and all its contributors.
