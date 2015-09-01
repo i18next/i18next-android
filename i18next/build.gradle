@@ -18,6 +18,57 @@ dependencies {
   testCompile 'org.json:json:20140107'
 }
 
+// Coveralls code coverage
+apply plugin: 'jacoco'
+apply plugin: 'com.github.kt3k.coveralls'
+
+jacoco {  
+  toolVersion = "0.7.5.201505241946"
+}
+
+def buildTypes = android.buildTypes.collect { type -> type.name }
+
+buildTypes.each { buildTypeName ->
+  def sourceName = "${buildTypeName}"
+  def targetName = "${sourceName.capitalize()}"
+  def testTaskName = "test${sourceName.capitalize()}UnitTest"
+  def coverageTaskName = "${testTaskName}Coverage"
+
+  task "$coverageTaskName" (type: JacocoReport, dependsOn: "$testTaskName") {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports on the ${targetName} build."
+
+    classDirectories = fileTree(
+      dir: "${project.buildDir}/intermediates/classes/${sourceName}",
+      excludes: ['**/R.class',
+                 '**/R$*.class',
+                 '**/*$ViewInjector*.*',
+                 '**/BuildConfig.*',
+                 '**/Manifest*.*']
+    )
+
+    sourceDirectories = files('src/main/java')
+    executionData = files("${project.buildDir}/jacoco/${testTaskName}.exec")
+
+    reports {
+      xml.enabled = true
+      html.enabled = true
+    }
+  }
+}
+
+coveralls {
+  jacocoReportPath = "${buildDir}/reports/jacoco/testReleaseUnitTestCoverage/testReleaseUnitTestCoverage.xml"
+}
+
+tasks.coveralls {
+  group = 'Coverage reports'
+  description = 'Uploads the coverage report to Coveralls'
+
+  dependsOn testReleaseUnitTestCoverage
+  onlyIf { System.env.'CI' }
+}
+
 // Bintray publishing
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
