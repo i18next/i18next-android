@@ -4,8 +4,15 @@ version = '1.0.0'
 group = 'com.i18next.android'
 
 android {
-  compileSdkVersion 15
+  compileSdkVersion 22
   buildToolsVersion '22.0.1'
+
+  defaultConfig {
+    minSdkVersion 14
+    targetSdkVersion 22
+    versionCode 1
+    versionName version
+  }
 
   testOptions {
     unitTests.returnDefaultValues = true
