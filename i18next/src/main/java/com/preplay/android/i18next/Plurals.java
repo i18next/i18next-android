@@ -502,7 +502,7 @@ public class Plurals {
         mHashPlurals.put("mnk", new PluralRule(0, 1, 2) {
             @Override
             protected int getPlurals(int n) {
-                return getInt(n == 1 ? 1 : 2);
+                return getInt(n == 0 ? 0 : n == 1 ? 1 : 2);
             }
         });
         mHashPlurals.put("mr", new PluralRule(1, 2) {
