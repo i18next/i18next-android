@@ -1,4 +1,4 @@
-package com.preplay.android.i18next;
+package com.i18next.android;
 
 import android.annotation.SuppressLint;
 import android.util.Log;

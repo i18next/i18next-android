@@ -1,7 +1,7 @@
 /**
  *
  */
-package com.preplay.android.i18next;
+package com.i18next.android;
 
 import java.util.HashMap;
 import java.util.Map;

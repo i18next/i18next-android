@@ -1,7 +1,7 @@
 # i18next-android
 
-[![Build Status](https://travis-ci.org/preplay/i18next-android.svg)](https://travis-ci.org/preplay/i18next-android)
-[![Coverage Status](https://coveralls.io/repos/preplay/i18next-android/badge.svg?service=github)](https://coveralls.io/github/preplay/i18next-android)
+[![Build Status](https://travis-ci.org/i18next/i18next-android.svg)](https://travis-ci.org/i18next/i18next-android)
+[![Coverage Status](https://coveralls.io/repos/i18next/i18next-android/badge.svg?service=github)](https://coveralls.io/github/i18next/i18next-android)
 
 i18next-android is a native Android port of [i18next](http://i18next.com/).
 
