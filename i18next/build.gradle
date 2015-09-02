@@ -80,8 +80,8 @@ tasks.coveralls {
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
-def siteUrl = 'https://github.com/preplay/i18next-android'
-def gitUrl = 'https://github.com/preplay/i18next-android.git'
+def siteUrl = 'https://github.com/i18next/i18next-android'
+def gitUrl = 'https://github.com/i18next/i18next-android.git'
 
 bintray { 
   // user and key come from the gradle.properties file in ~/.gradle
@@ -94,7 +94,7 @@ bintray {
     //userOrg = user
     licenses = ['MIT']
     websiteUrl = siteUrl
-    vcsUrl = 'https://github.com/preplay/i18next-android.git'
+    vcsUrl = gitUrl
     labels = ['android', 'i18n', 'i18next', 'internationalization', 'localization', 'translation']
     publicDownloadNumbers = true
     publish = true
