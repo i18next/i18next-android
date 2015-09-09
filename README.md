@@ -2,6 +2,10 @@
 
 [![Build Status](https://travis-ci.org/i18next/i18next-android.svg)](https://travis-ci.org/i18next/i18next-android)
 [![Coverage Status](https://coveralls.io/repos/i18next/i18next-android/badge.svg?service=github)](https://coveralls.io/github/i18next/i18next-android)
+[![jCenter](https://img.shields.io/bintray/v/bintray/jcenter/i18next-android.svg?label=jcenter)](https://bintray.com/bintray/jcenter?filterByPkgName=i18next-android)
+[![Maven Central](https://img.shields.io/maven-central/v/com.i18next/i18next-android.svg)](https://search.maven.org/#search|ga|1|g:"com.i18next" AND a:"i18next-android")
+![License](https://img.shields.io/badge/licence-MIT-373737.svg)
+
 
 i18next-android is a native Android port of [i18next](http://i18next.com/).
 
