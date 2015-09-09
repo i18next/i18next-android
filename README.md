@@ -5,14 +5,31 @@
 
 i18next-android is a native Android port of [i18next](http://i18next.com/).
 
-----------
-
 ## Why?
 
 In order to use the same translated strings for the Web, Android and iOS, we decided to use the i18next features and data formats.
 
 This library is our implementation for Android.
 We've been using it in production for a few years.
+
+## Download
+
+i18next-android is available under both jCenter and Maven Central.
+
+Grab via Gradle:
+```groovy
+dependencies {
+  compile 'com.i18next:i18next-android:1.0.0'
+}
+```
+or Maven:
+```xml
+<dependency>
+  <groupId>com.i18next</groupId>
+  <artifactId>i18next-android</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
 
 ----------
 
